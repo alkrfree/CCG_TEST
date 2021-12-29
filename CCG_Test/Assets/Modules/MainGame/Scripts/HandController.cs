@@ -18,19 +18,26 @@ namespace MainGame {
         [SerializeField] Transform[] points;
 
         [SerializeField] Transform rotationCenter;
+
+        private int changeValueCounter;
         private void Awake() {
             cardFactory = GetComponent<CardFactory>();
         }
         void Start() {
             var cards = CardDataManager.Instance.Cards;
-            //for (int i = 0; i < cards.Length; i++) {
-            //    cardsInHand.Add(cardFactory.SpawnCard(cards[i]));
-            //}
-
-            for (int i = 0; i < testCount; i++) {
-                cardsInHand.Add(cardFactory.SpawnTestCard());
+            for (int i = 0; i < cards.Length; i++) {
+                var card = cardFactory.SpawnCard(cards[i]);
+                cardsInHand.Add(card);
+                card.OnDeath += OnCardDeath;
             }
-            cardsInHand.OrderBy(card => card.HealthPoints);
+
+            //for (int i = 0; i < testCount; i++) {
+            //    cardsInHand.Add(cardFactory.SpawnTestCard());
+            //}
+            cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
+            for (int i = 0; i < cardsInHand.Count; i++) {
+                Debug.Log(" hp" + cardsInHand[i].cardData.HealthPoints);
+            }
             ArrangeCardsOnArc();
         }
 
@@ -46,20 +53,57 @@ namespace MainGame {
                 m2 = Vector3.Lerp(points[1].position, points[2].position, counter);
                 pos = Vector3.Lerp(m1, m2, counter);
 
-                cardsInHand[i].transform.position = pos;
+                cardsInHand[i].Position = pos;
 
                 lookRotation = Quaternion.LookRotation(Vector3.forward,
-                    (cardsInHand[i].transform.position - rotationCenter.position).normalized);
-                cardsInHand[i].transform.rotation = lookRotation;
+                    (pos - rotationCenter.position).normalized);
+                cardsInHand[i].Rotation = lookRotation.eulerAngles;
 
-                cardsInHand[i].transform.SetAsLastSibling();
-
+                cardsInHand[i].transform.SetSiblingIndex(i);
+                cardsInHand[i].SiblingIndex = cardsInHand[i].transform.GetSiblingIndex();
                 counter += increment;
             }
-
-
-
         }
+
+        public void ChangeRandomValueOfCard() {
+            // cardsInHand[0].HealthPoints = UnityEngine.Random.Range(-2, 10);
+            Debug.Log("changeValueCounter = " + changeValueCounter);
+            switch (UnityEngine.Random.Range(0, 3)) {
+                case 0:
+                    cardsInHand[changeValueCounter].HealthPoints = UnityEngine.Random.Range(-2, 10);
+                    break;
+                case 1:
+                    cardsInHand[changeValueCounter].AttackPoints = UnityEngine.Random.Range(-2, 10);
+                    break;
+                case 2:
+                    cardsInHand[changeValueCounter].ManaPoints = UnityEngine.Random.Range(-2, 10);
+                    break;
+            }
+
+            if (changeValueCounter + 1 == cardsInHand.Count) {
+                changeValueCounter = 0;
+            } else {
+                changeValueCounter++;
+            }
+        }
+
+        public void KillRandomCard() {
+            cardsInHand[UnityEngine.Random.Range(0, cardsInHand.Count)].HealthPoints = -9;
+        }
+        private void OnCardDeath(Card card) {
+            cardFactory.KillCard(card);
+            if (cardsInHand.Contains(card)) {
+                cardsInHand.Remove(card);
+            } else {
+                Debug.LogError("No card in hand");
+            }
+            if (changeValueCounter == cardsInHand.Count) {
+                changeValueCounter--;
+            }
+            ArrangeCardsOnArc();
+        }
+
+
         private void OnDrawGizmos() {
             Gizmos.DrawLine(points[0].position, points[1].position);
             Gizmos.DrawLine(points[1].position, points[2].position);

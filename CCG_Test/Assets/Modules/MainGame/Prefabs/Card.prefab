@@ -171,11 +171,11 @@ MonoBehaviour:
   cardData: {fileID: 0}
   Title: {fileID: 4410289920914161917}
   Description: {fileID: 7243623085658853611}
-  AttackPoints: {fileID: 1302233772032301211}
+  AttackPointsText: {fileID: 1302233772032301211}
   AttackIcon: {fileID: 5164451658321876710}
-  HealthPoints: {fileID: 2102465095191912103}
+  HealthPointsText: {fileID: 2102465095191912103}
   HealthIcon: {fileID: 5995662566755091980}
-  ManaPoints: {fileID: 6930240644873146256}
+  ManaPointsText: {fileID: 6930240644873146256}
   ManaIcon: {fileID: 7109296326309027462}
   MainImage: {fileID: 7504474550376679273}
 --- !u!1 &2771846967960358300

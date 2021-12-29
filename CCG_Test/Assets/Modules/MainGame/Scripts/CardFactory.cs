@@ -19,13 +19,17 @@ namespace MainGame {
 
             card.Title.text = cardData.Title;
             card.Description.text = cardData.Description;
-            card.AttackPoints.text = cardData.AttackPoints.ToString();
+            card.AttackPointsText.text = cardData.AttackPoints.ToString();
 
-            card.HealthPoints.text = cardData.HealthPoints.ToString();
-            card.ManaPoints.text = cardData.ManaPoints.ToString();
+            card.HealthPointsText.text = cardData.HealthPoints.ToString();
+            card.ManaPointsText.text = cardData.ManaPoints.ToString();
             card.MainImage.sprite = cardData.MainSprite;
             card.cardData = cardData;
             return card;
+        }
+
+        public void KillCard(Card card) {
+            cardObjectPool.PoolObject(card.gameObject);
         }
 
         public Card SpawnTestCard() {
