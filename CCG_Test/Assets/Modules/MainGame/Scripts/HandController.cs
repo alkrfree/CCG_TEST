@@ -10,13 +10,13 @@ namespace MainGame {
         private CardFactory cardFactory;
         private List<Card> cardsInHand = new List<Card>();
         [SerializeField] Transform cardParent;
-        [SerializeField] float arcRadius;
-        [SerializeField] float horizontalOffset;
-        [SerializeField] float veticalOffset;
 
-        [SerializeField] Transform point1;
-        [SerializeField] Transform point2;
-        [SerializeField] Transform point3;
+
+        [SerializeField] float testCount;
+
+
+        [SerializeField] Transform[] points;
+
         [SerializeField] Transform rotationCenter;
         private void Awake() {
             cardFactory = GetComponent<CardFactory>();
@@ -26,7 +26,8 @@ namespace MainGame {
             //for (int i = 0; i < cards.Length; i++) {
             //    cardsInHand.Add(cardFactory.SpawnCard(cards[i]));
             //}
-            for (int i = 0; i < 6; i++) {
+
+            for (int i = 0; i < testCount; i++) {
                 cardsInHand.Add(cardFactory.SpawnTestCard());
             }
             cardsInHand.OrderBy(card => card.HealthPoints);
@@ -34,85 +35,34 @@ namespace MainGame {
         }
 
         private void ArrangeCardsOnArc() {
-            int middleId = (int)Math.Ceiling(cardsInHand.Count / 2f);
-            var pos = cardParent.position;
-            //  cardsInHand[middleId].transform.position = new Vector3(pos.x, pos.y + arcRadius, pos.z);
-
-            //float currentCardOffset = horizontalOffset;
-            //var offsetCounter = currentCardOffset;
-
+            Vector3 pos;
+            Vector3 m1;
+            Vector3 m2;
+            Quaternion lookRotation;
+            float increment = 1f / (cardsInHand.Count + 1);
+            float counter = increment;
             for (int i = 0; i < cardsInHand.Count; i++) {
-                //   pos = cardParent.position;
+                m1 = Vector3.Lerp(points[0].position, points[1].position, counter);
+                m2 = Vector3.Lerp(points[1].position, points[2].position, counter);
+                pos = Vector3.Lerp(m1, m2, counter);
 
+                cardsInHand[i].transform.position = pos;
 
-                float posX = pos.x - horizontalOffset * ((middleId) - i);
-
-                float posY = pos.y + arcRadius - veticalOffset * Mathf.Abs((middleId - i));
-                Debug.Log("posY = " + posY);
-                cardsInHand[i].transform.position = new Vector3(posX, posY, pos.z);
-                //currentCardOffset += offsetCounter;
-
-
-
-                var _direction = (cardParent.position - cardsInHand[i].transform.position).normalized * -1;
-                var _lookRotation = Quaternion.LookRotation(Vector3.forward, _direction);
-
-                cardsInHand[i].transform.rotation = _lookRotation;
+                lookRotation = Quaternion.LookRotation(Vector3.forward,
+                    (cardsInHand[i].transform.position - rotationCenter.position).normalized);
+                cardsInHand[i].transform.rotation = lookRotation;
 
                 cardsInHand[i].transform.SetAsLastSibling();
 
+                counter += increment;
             }
 
 
-            //for (int i = middleId - 1; i >= 0; i--) {
-            //    pos = cardParent.position;
-            //    cardsInHand[i].transform.position = new Vector3(pos.x - currentCardOffset, pos.y + arcRadius, pos.z);
-            //    currentCardOffset += offsetCounter;
-            //}
 
-            //currentCardOffset = zeroDegreeOffset;
-            //for (int i = middleId + 1; i < cardsInHand.Count; i++) {
-            //    pos = cardParent.position;
-            //    cardsInHand[i].transform.position = new Vector3(pos.x + currentCardOffset, pos.y + arcRadius, pos.z);
-            //    currentCardOffset += offsetCounter;
-            //}
-
-
-
-
-
-
-
-
-
-
-            //var pos = cardParent.position;
-
-            //var degrees = (180f - zeroDegreeOffset) / cardsInHand.Count;
-            //var degreesCounter = degrees;
-
-            //Debug.Log(degrees);
-            //for (int i = 0; i < cardsInHand.Count; i++) {
-
-            //    float x = pos.x + arcRadius * Mathf.Cos(degrees * Mathf.Deg2Rad);
-            //    float y = pos.y + arcRadius * Mathf.Sin(degrees * Mathf.Deg2Rad);
-            //    cardsInHand[i].transform.position = new Vector3(x, y, pos.z);
-
-            //    var _direction = (cardParent.position - cardsInHand[i].transform.position).normalized * -1;
-            //    var _lookRotation = Quaternion.LookRotation(Vector3.forward, _direction);
-
-            //    cardsInHand[i].transform.rotation = _lookRotation;
-
-            //    degrees += degreesCounter;
-            //    cardsInHand[i].transform.SetAsFirstSibling();
-
-            //}
-
-            //Debug.Log("middleId = " + middleId);
         }
         private void OnDrawGizmos() {
-            Gizmos.DrawLine(point1.position, point2.position);
-            Gizmos.DrawLine(point2.position, point3.position);
+            Gizmos.DrawLine(points[0].position, points[1].position);
+            Gizmos.DrawLine(points[1].position, points[2].position);
 
             Gizmos.DrawSphere(rotationCenter.position, 20f);
         }
