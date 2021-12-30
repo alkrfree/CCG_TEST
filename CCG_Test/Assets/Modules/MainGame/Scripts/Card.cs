@@ -7,9 +7,10 @@ using DG.Tweening;
 using UnityEngine.EventSystems;
 using System;
 namespace MainGame {
-    public class Card : MonoBehaviour, IResetable, IPointerEnterHandler, IPointerExitHandler {
+    public class Card : MonoBehaviour, IResetable {
         public delegate void CardHandler(Card card);
         public event CardHandler OnDeath;
+        
         [HideInInspector] public CardData cardData;
 
         public TMP_Text Title;
@@ -26,7 +27,8 @@ namespace MainGame {
 
         public Image MainImage;
 
-        [HideInInspector] public int SiblingIndex;
+        //[HideInInspector] public int SiblingIndex;
+
         public int HealthPoints {
             get {
                 return cardData.HealthPoints;
@@ -77,26 +79,19 @@ namespace MainGame {
             }
         }
 
-        public void OnPointerClick(PointerEventData eventData) {
+   
 
-            MainImage.color = Color.blue;
-        }
-
-        public void OnPointerEnter(PointerEventData eventData) {
-            transform.localScale *= 1.2f;
-            transform.SetSiblingIndex(999);
-        }
-
-        public void OnPointerExit(PointerEventData eventData) {
-            transform.localScale = Vector3.one;
-            transform.SetSiblingIndex(SiblingIndex);
-        }
+ 
 
         public void Reset() {
 
         }
+
+
     }
 }
+
+
 //Art + UI overlay
 //Title
 //Description

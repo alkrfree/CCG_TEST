@@ -29,15 +29,16 @@ namespace MainGame {
                 var card = cardFactory.SpawnCard(cards[i]);
                 cardsInHand.Add(card);
                 card.OnDeath += OnCardDeath;
+                card.GetComponent<CardDragAndDrop>().OnTableDrop += OnCardTableDrop;
             }
 
             //for (int i = 0; i < testCount; i++) {
-            //    cardsInHand.Add(cardFactory.SpawnTestCard());
+            //    var card = cardFactory.SpawnTestCard();
+            //    cardsInHand.Add(card);
+            //    card.OnDeath += OnCardDeath;
             //}
-            cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
-            for (int i = 0; i < cardsInHand.Count; i++) {
-                Debug.Log(" hp" + cardsInHand[i].cardData.HealthPoints);
-            }
+         //   cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
+           
             ArrangeCardsOnArc();
         }
 
@@ -60,12 +61,15 @@ namespace MainGame {
                 cardsInHand[i].Rotation = lookRotation.eulerAngles;
 
                 cardsInHand[i].transform.SetSiblingIndex(i);
-                cardsInHand[i].SiblingIndex = cardsInHand[i].transform.GetSiblingIndex();
+             //   cardsInHand[i].SiblingIndex = cardsInHand[i].transform.GetSiblingIndex();
                 counter += increment;
             }
         }
 
         public void ChangeRandomValueOfCard() {
+            if (cardsInHand.Count == 0) {
+                return;
+            }
             // cardsInHand[0].HealthPoints = UnityEngine.Random.Range(-2, 10);
             Debug.Log("changeValueCounter = " + changeValueCounter);
             switch (UnityEngine.Random.Range(0, 3)) {
@@ -88,10 +92,26 @@ namespace MainGame {
         }
 
         public void KillRandomCard() {
+            if (cardsInHand.Count == 0) {
+                return;
+            }
             cardsInHand[UnityEngine.Random.Range(0, cardsInHand.Count)].HealthPoints = -9;
         }
         private void OnCardDeath(Card card) {
             cardFactory.KillCard(card);
+            if (cardsInHand.Contains(card)) {
+                cardsInHand.Remove(card);
+            } else {
+                Debug.LogError("No card in hand");
+            }
+            if (changeValueCounter == cardsInHand.Count) {
+                changeValueCounter--;
+            }
+            ArrangeCardsOnArc();
+        }
+
+        private void OnCardTableDrop(Card card) {
+          //  cardFactory.KillCard(card);
             if (cardsInHand.Contains(card)) {
                 cardsInHand.Remove(card);
             } else {
