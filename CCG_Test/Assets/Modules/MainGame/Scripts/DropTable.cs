@@ -13,22 +13,20 @@ namespace MainGame {
             if (cardsOnTable + 1 > cardLimmit) {
                 return false;
             }
-            ResetCardGraphics(cardTransform);
 
+            DOTween.Kill(cardTransform); // stop all animations
 
             cardTransform.transform.SetParent(transform);
+            
             if (cardTransform.TryGetComponent(out CardHover cardHover)) {
-                Destroy(cardHover);
+                cardHover.IsPlaying = false;
             }
+            cardTransform.SetAsLastSibling();
             cardsOnTable++;
             return true;
         }
 
-        private void ResetCardGraphics(Transform cardTransform) {
-            cardTransform.rotation = Quaternion.Euler(0, 0, 0);
-            cardTransform.localScale = Vector3.one;
-            DOTween.Kill(cardTransform);
-        }
+
     }
 
 }
