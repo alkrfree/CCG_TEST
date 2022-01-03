@@ -88,9 +88,8 @@ GameObject:
   - component: {fileID: 1366331499474531194}
   - component: {fileID: 4482177750093072288}
   - component: {fileID: 2727672926029763377}
-  - component: {fileID: -3038273947022768421}
   - component: {fileID: 6766829254970347841}
-  - component: {fileID: -2987959260601958366}
+  - component: {fileID: -5976073385644105722}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -181,19 +180,6 @@ MonoBehaviour:
   ManaPointsText: {fileID: 6930240644873146256}
   ManaIcon: {fileID: 7109296326309027462}
   MainImage: {fileID: 7504474550376679273}
-  SiblingIndex: 0
---- !u!114 &-3038273947022768421
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1476454837326415584}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 798603937a9ea0640b874201193bdfcc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6766829254970347841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -206,18 +192,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ad611dd119d87542acb5c29b33156e8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!225 &-2987959260601958366
-CanvasGroup:
+--- !u!114 &-5976073385644105722
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1476454837326415584}
   m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 798603937a9ea0640b874201193bdfcc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DroppedOnTable: 0
 --- !u!1 &2771846967960358300
 GameObject:
   m_ObjectHideFlags: 0

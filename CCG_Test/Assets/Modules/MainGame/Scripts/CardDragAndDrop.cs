@@ -4,85 +4,58 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using DG.Tweening;
 namespace MainGame {
-    public class CardDragAndDrop : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler {
+    public class CardDragAndDrop : MonoBehaviour, IDraggable {
+        public RectTransform RectTransform => rectTransform;
 
-        public event Card.CardHandler OnTableDrop;
-        private Vector2 lastMousePosition;
-        private CanvasGroup canvasGroup;
-        // private RectTransform rectTransform;
-        //  [SerializeField] private Canvas canvas;
-        public bool DroppedOnTable;
-        Vector3 cachedRotation;
-        Vector3 cachedPosition;
+        public bool IsDraggable { get => isDraggable; }
+        private bool isDraggable = true;
 
+        public bool IsDroppedOnTable { get => isDroppedOnTable; set => isDroppedOnTable = value; }
+        private bool isDroppedOnTable;
+        private RectTransform rectTransform; 
+
+        private bool isMoveTweenFinised;
+        private bool isRotateTweenFinished;
+        private Card card;
         void Awake() {
-            canvasGroup = GetComponent<CanvasGroup>();
-            //    rectTransform = GetComponent<RectTransform>();
+            rectTransform = GetComponent<RectTransform>();
+            card = GetComponent<Card>();
+        }
+
+        public void OnDrag() {
 
         }
 
-        public void OnDrag(PointerEventData eventData) {
-            if (DroppedOnTable) {
-                return;
-            }
-            //   rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
-            Vector2 currentMousePosition = eventData.position;
-            Vector2 diff = currentMousePosition - lastMousePosition;
-            RectTransform rect = GetComponent<RectTransform>();
-
-            Vector3 newPosition = rect.position + new Vector3(diff.x, diff.y, transform.position.z);
-            Vector3 oldPos = rect.position;
-            rect.position = newPosition;
-            if (!IsRectTransformInsideScreen(rect)) {
-                rect.position = oldPos;
-            }
-            lastMousePosition = currentMousePosition;
-        }
-
-        public void OnBeginDrag(PointerEventData eventData) {
-            if (DroppedOnTable) {
-                return;
-            }
-            cachedRotation = transform.rotation.eulerAngles;
-            cachedPosition = transform.position;
+        public void OnBeginDrag() {
             transform.rotation = Quaternion.Euler(0, 0, 0);
-            canvasGroup.blocksRaycasts = false;
             Debug.Log("Begin Drag");
-            lastMousePosition = eventData.position;
+
         }
 
-        public void OnEndDrag(PointerEventData eventData) {
-            if (DroppedOnTable) {
-                return;
+        public void OnEndDrag() {
+            if (!IsDroppedOnTable) {
+                ReturnCardBackAnimation();
             }
-            canvasGroup.blocksRaycasts = true;
-            if (!DroppedOnTable) {
-                transform.DOMove(cachedPosition, 0.5f);
-                transform.DORotate(cachedRotation, 0.5f);
-            } else {
-                OnTableDrop?.Invoke(GetComponent<Card>());
-            }
-
             Debug.Log("End Drag");
         }
 
-        private bool IsRectTransformInsideScreen(RectTransform rectTransform) {
-            bool isInside = false;
-            Vector3[] corners = new Vector3[4];
-            rectTransform.GetWorldCorners(corners);
-            int visibleCorners = 0;
-            Rect rect = new Rect(0, 0, Screen.width, Screen.height);
-            foreach (Vector3 corner in corners) {
-                if (rect.Contains(corner)) {
-                    visibleCorners++;
-                }
-            }
-            if (visibleCorners == 4) {
-                isInside = true;
-            }
-            return isInside;
+        private void ReturnCardBackAnimation() {
+            isMoveTweenFinised = false;
+            isRotateTweenFinished = false;
+            isDraggable = false;
+
+            transform.DOMove(card.PositionInHands, 0.5f).OnComplete(() => {
+                isMoveTweenFinised = true;
+                IsTweenEnded();
+            });
+
+            transform.DORotate(card.RotationInHands, 0.5f).OnComplete(() => {
+                isRotateTweenFinished = true;
+                IsTweenEnded();
+            });
         }
-
-
+        private void IsTweenEnded() {
+            isDraggable = isMoveTweenFinised && isRotateTweenFinished;
+        }
     }
 }

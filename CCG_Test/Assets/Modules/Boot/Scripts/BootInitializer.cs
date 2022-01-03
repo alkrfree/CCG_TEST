@@ -12,12 +12,7 @@ namespace Boot {
             StartCoroutine(LoadingProgress());
             netResourceLoader.OnDownloadDone += sprites => { this.sprites = sprites; isNetImagesLoaded = true; };
             netResourceLoader.Load(Random.Range(cardCountRange.x, cardCountRange.y));
-
-
         }
-
-
-
         private IEnumerator LoadingProgress() {
             yield return new WaitUntil(() => isNetImagesLoaded);
             MainGame.CardDataManager.Instance.InitCardDataByImages(sprites);

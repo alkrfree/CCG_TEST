@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 namespace MainGame {
     public class CardHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
-        // Start is called before the first frame update
         int cachedSbiling;
         public void OnPointerEnter(PointerEventData eventData) {
             transform.localScale *= 1.2f;

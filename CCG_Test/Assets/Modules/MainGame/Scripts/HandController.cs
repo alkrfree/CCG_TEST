@@ -12,7 +12,7 @@ namespace MainGame {
         [SerializeField] Transform cardParent;
 
 
-        [SerializeField] float testCount;
+        // [SerializeField] float testCount;
 
 
         [SerializeField] Transform[] points;
@@ -24,12 +24,13 @@ namespace MainGame {
             cardFactory = GetComponent<CardFactory>();
         }
         void Start() {
+            DragAndDropManager.Instance.OnTableDrop += OnCardTableDrop;
+
             var cards = CardDataManager.Instance.Cards;
             for (int i = 0; i < cards.Length; i++) {
                 var card = cardFactory.SpawnCard(cards[i]);
                 cardsInHand.Add(card);
                 card.OnDeath += OnCardDeath;
-                card.GetComponent<CardDragAndDrop>().OnTableDrop += OnCardTableDrop;
             }
 
             //for (int i = 0; i < testCount; i++) {
@@ -37,8 +38,9 @@ namespace MainGame {
             //    cardsInHand.Add(card);
             //    card.OnDeath += OnCardDeath;
             //}
-         //   cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
-           
+
+            cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
+
             ArrangeCardsOnArc();
         }
 
@@ -54,14 +56,13 @@ namespace MainGame {
                 m2 = Vector3.Lerp(points[1].position, points[2].position, counter);
                 pos = Vector3.Lerp(m1, m2, counter);
 
-                cardsInHand[i].Position = pos;
+                cardsInHand[i].PositionInHands = pos;
 
                 lookRotation = Quaternion.LookRotation(Vector3.forward,
                     (pos - rotationCenter.position).normalized);
-                cardsInHand[i].Rotation = lookRotation.eulerAngles;
+                cardsInHand[i].RotationInHands = lookRotation.eulerAngles;
 
                 cardsInHand[i].transform.SetSiblingIndex(i);
-             //   cardsInHand[i].SiblingIndex = cardsInHand[i].transform.GetSiblingIndex();
                 counter += increment;
             }
         }
@@ -70,7 +71,7 @@ namespace MainGame {
             if (cardsInHand.Count == 0) {
                 return;
             }
-            // cardsInHand[0].HealthPoints = UnityEngine.Random.Range(-2, 10);
+
             Debug.Log("changeValueCounter = " + changeValueCounter);
             switch (UnityEngine.Random.Range(0, 3)) {
                 case 0:
@@ -111,7 +112,6 @@ namespace MainGame {
         }
 
         private void OnCardTableDrop(Card card) {
-          //  cardFactory.KillCard(card);
             if (cardsInHand.Contains(card)) {
                 cardsInHand.Remove(card);
             } else {
@@ -123,6 +123,9 @@ namespace MainGame {
             ArrangeCardsOnArc();
         }
 
+        private void OnDestroy() {
+            DragAndDropManager.Instance.OnTableDrop -= OnCardTableDrop;
+        }
 
         private void OnDrawGizmos() {
             Gizmos.DrawLine(points[0].position, points[1].position);

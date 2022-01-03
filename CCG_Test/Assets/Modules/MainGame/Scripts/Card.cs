@@ -10,7 +10,7 @@ namespace MainGame {
     public class Card : MonoBehaviour, IResetable {
         public delegate void CardHandler(Card card);
         public event CardHandler OnDeath;
-        
+
         [HideInInspector] public CardData cardData;
 
         public TMP_Text Title;
@@ -27,7 +27,28 @@ namespace MainGame {
 
         public Image MainImage;
 
-        //[HideInInspector] public int SiblingIndex;
+
+        private Vector3 positionInHands;
+        public Vector3 PositionInHands {
+            set {
+                positionInHands = value;
+                transform.DOMove(value, 1f);
+            }
+            get {
+                return positionInHands;
+            }
+        }
+
+        private Vector3 rotationInHands;
+        public Vector3 RotationInHands {
+            set {
+                rotationInHands = value;
+                transform.DORotate(value, 1f);
+            }
+            get {
+                return rotationInHands;
+            }
+        }
 
         public int HealthPoints {
             get {
@@ -40,7 +61,6 @@ namespace MainGame {
                     if (cardData.HealthPoints <= 0) {
                         OnDeath?.Invoke(this);
                     }
-
                 });
             }
         }
@@ -67,21 +87,9 @@ namespace MainGame {
             }
         }
 
-        public Vector3 Position {
-            set {
-                transform.DOMove(value, 1f);
-            }
-        }
 
-        public Vector3 Rotation {
-            set {
-                transform.DORotate(value, 1f);
-            }
-        }
 
-   
 
- 
 
         public void Reset() {
 

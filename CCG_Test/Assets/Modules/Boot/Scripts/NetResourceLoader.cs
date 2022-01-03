@@ -34,7 +34,6 @@ namespace Boot {
 
         private void AddSprite(Sprite sprite) {
             sprites[currentCount] = sprite;
-            //  Debug.Log("Loaded " + currentCount + " image");
             if (currentCount + 1 > targetCount - 1) {
                 Debug.Log("Net loading Done ");
                 OnDownloadDone?.Invoke(sprites);

@@ -4,15 +4,10 @@ using UnityEngine;
 
 namespace MainGame {
     public class CardFactory : MonoBehaviour {
-
-        //   [SerializeField] private Card cardPrefab;
-        // [SerializeField] private Transform cardParent;
-
         private GameObjectPool cardObjectPool;
         void Awake() {
             cardObjectPool = GetComponent<GameObjectPool>();
         }
-
 
         public Card SpawnCard(CardData cardData) {
             var card = cardObjectPool.GetObjectFromPool().GetComponent<Card>();
