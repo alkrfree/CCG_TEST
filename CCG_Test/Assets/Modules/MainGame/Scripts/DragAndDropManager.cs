@@ -45,7 +45,6 @@ namespace MainGame {
 
 
             if (draggable is CardDragAndDrop cardDragAndDrop) {
-                Debug.Log(" cardDragAndDrop = " + cardDragAndDrop, cardDragAndDrop.gameObject);
                 if (!cardDragAndDrop.IsDraggable || cardDragAndDrop.IsDroppedOnTable) return;
                 selectedObject = cardDragAndDrop;
                 DOTween.Kill(selectedObject.transform);

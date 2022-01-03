@@ -9,15 +9,14 @@ namespace MainGame {
 
         private CardFactory cardFactory;
         private List<Card> cardsInHand = new List<Card>();
+        [SerializeField] private RectTransform MainCanvasTransform;
         [SerializeField] Transform cardParent;
-
-
-        // [SerializeField] float testCount;
-
 
         [SerializeField] Transform[] points;
 
         [SerializeField] Transform rotationCenter;
+        [SerializeField] float cardLineOffsetX = 300f;
+        [SerializeField] float cardLineOffsetY = 20f;
 
         private int changeValueCounter;
         private void Awake() {
@@ -33,17 +32,32 @@ namespace MainGame {
                 card.OnDeath += OnCardDeath;
             }
 
-            //for (int i = 0; i < testCount; i++) {
-            //    var card = cardFactory.SpawnTestCard();
-            //    cardsInHand.Add(card);
-            //    card.OnDeath += OnCardDeath;
-            //}
+            // make offset adaptive
+            cardLineOffsetX *= MainCanvasTransform.localScale.x;
+            cardLineOffsetY *= MainCanvasTransform.localScale.y;
 
             cardsInHand = cardsInHand.OrderBy(card => card.cardData.HealthPoints).ToList();
-
-            ArrangeCardsOnArc();
+            ArrangeCards();
         }
 
+        private void ArrangeCards() {
+            if (cardsInHand.Count > 3) {
+                ArrangeCardsOnArc();
+            } else {
+                ArrangeCardsOnLine();
+            }
+        }
+        private void ArrangeCardsOnLine() {
+            float increment = 1f / (cardsInHand.Count + 1);
+            float counter = increment;
+
+            for (int i = 0; i < cardsInHand.Count; i++) {
+                var x = Mathf.Lerp(points[0].position.x, points[2].position.x, counter);
+                var pos = new Vector3(x + (cardLineOffsetX * i), points[0].position.y + cardLineOffsetY, points[0].position.z);
+                cardsInHand[i].PositionInHands = pos;
+                cardsInHand[i].RotationInHands = Vector3.zero;
+            }
+        }
         private void ArrangeCardsOnArc() {
             Vector3 pos;
             Vector3 m1;
@@ -72,7 +86,6 @@ namespace MainGame {
                 return;
             }
 
-            Debug.Log("changeValueCounter = " + changeValueCounter);
             switch (UnityEngine.Random.Range(0, 3)) {
                 case 0:
                     cardsInHand[changeValueCounter].HealthPoints = UnityEngine.Random.Range(-2, 10);
@@ -85,7 +98,7 @@ namespace MainGame {
                     break;
             }
 
-            if (changeValueCounter + 1 == cardsInHand.Count) {
+            if (changeValueCounter + 1 >= cardsInHand.Count) {
                 changeValueCounter = 0;
             } else {
                 changeValueCounter++;
@@ -100,28 +113,30 @@ namespace MainGame {
         }
         private void OnCardDeath(Card card) {
             cardFactory.KillCard(card);
+            RemoveCardFromHands(card);
+        }
+        private void OnCardTableDrop(Card card) {
+            RemoveCardFromHands(card);
+        }
+        private void RemoveCardFromHands(Card card) {
+            var index = 0;
             if (cardsInHand.Contains(card)) {
+                index = cardsInHand.FindIndex(a => a == card);
                 cardsInHand.Remove(card);
             } else {
                 Debug.LogError("No card in hand");
             }
-            if (changeValueCounter == cardsInHand.Count) {
+
+            if (changeValueCounter > index) {
                 changeValueCounter--;
             }
-            ArrangeCardsOnArc();
+
+            if (changeValueCounter == cardsInHand.Count) {
+                changeValueCounter = 0;
+            }
+            ArrangeCards();
         }
 
-        private void OnCardTableDrop(Card card) {
-            if (cardsInHand.Contains(card)) {
-                cardsInHand.Remove(card);
-            } else {
-                Debug.LogError("No card in hand");
-            }
-            if (changeValueCounter == cardsInHand.Count) {
-                changeValueCounter--;
-            }
-            ArrangeCardsOnArc();
-        }
 
         private void OnDestroy() {
             DragAndDropManager.Instance.OnTableDrop -= OnCardTableDrop;
