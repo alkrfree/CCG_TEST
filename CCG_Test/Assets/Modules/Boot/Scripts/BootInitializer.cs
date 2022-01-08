@@ -10,7 +10,7 @@ namespace Boot {
         private bool isNetImagesLoaded = false;
         void Start() {
             StartCoroutine(LoadingProgress());
-            netResourceLoader.OnDownloadDone += sprites => { this.sprites = sprites; isNetImagesLoaded = true; };
+            netResourceLoader.OnDownloadDone += DownloadDone;
             netResourceLoader.Load(Random.Range(cardCountRange.x, cardCountRange.y));
         }
         private IEnumerator LoadingProgress() {
@@ -18,9 +18,13 @@ namespace Boot {
             MainGame.CardDataManager.Instance.InitCardDataByImages(sprites);
             SceneManager.LoadScene(1);
         }
-        private void OnDestroy() {
-            netResourceLoader.OnDownloadDone -= images => this.sprites = images;
-        }
 
+        private void DownloadDone(Sprite[] sprites) {
+            this.sprites = sprites;
+            isNetImagesLoaded = true;
+        }
+        private void OnDestroy() {
+            netResourceLoader.OnDownloadDone -= DownloadDone;
+        }
     }
 }
